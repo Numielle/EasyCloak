@@ -1,0 +1,9 @@
+## Interface: 11200
+## Title: EasyCloak
+## Notes: Equips Onyxia Scale Cloak in Nefarian's Lair.
+## Author: Numielle
+## Version: 0.1
+## Dependencies:
+## SavedVariables: 
+
+EasyCloakMain.lua
