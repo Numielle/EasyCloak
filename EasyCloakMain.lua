@@ -2,6 +2,7 @@ local f = CreateFrame("frame")
 f:RegisterEvent("ZONE_CHANGED_INDOORS")
 f:RegisterEvent("PLAYER_TARGET_CHANGED")
 f:RegisterEvent("PLAYER_REGEN_ENABLED")
+f:RegisterEvent("ADDON_LOADED")
 
 local ONY_CLOAK_NAME = "Onyxia Scale Cloak"
 local NOT_FOUND_MSG = ONY_CLOAK_NAME.." not found in your inventory!"
@@ -80,6 +81,14 @@ local function onEvent()
 		equipCloakOnCombatEnd = false
 		
 		equipOnyCloak()
+	elseif event == "ADDON_LOADED" and arg1 == "EasyCloak" then
+		if not EasyCloakDB then
+			-- initialize DB (first time addon is loaded)
+			EasyCloakDB = {}
+			EasyCloakDB.drakes = true
+		end
+		
+		-- process settings from DB and perform setup actions
 	end	
  end
  
