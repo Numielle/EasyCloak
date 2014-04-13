@@ -74,7 +74,8 @@ local function onEvent()
 			equipOnyCloak()
 		end
 	elseif event == "PLAYER_TARGET_CHANGED" then
-		if UnitName("target") and ecBosses[UnitName("target")] then
+		if UnitName("target") and ecBosses[UnitName("target")] 
+				and UnitHealth("target") > 0 then
 			equipOnyCloak()
 		end
 	elseif event == "PLAYER_REGEN_ENABLED" and equipCloakOnCombatEnd then
