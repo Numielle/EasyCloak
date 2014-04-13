@@ -43,7 +43,7 @@ end
 local function equipOnyCloak() 
 	-- check if cloak already equipped and return
 	local currentCloak = GetInventoryItemLink("player", GetInventorySlotInfo("BackSlot"))
-	--if currentCloak and string.find(currentCloak, ONY_CLOAK_NAME) then return end
+	if currentCloak and string.find(currentCloak, ONY_CLOAK_NAME) then return end
 
 	-- if player is in combat, equip cloak when combat is over
 	if UnitAffectingCombat("player") then
