@@ -76,8 +76,7 @@ local function equipOnyCloak()
 	if currentCloak and string.find(currentCloak, ONY_CLOAK_NAME) then return end
 
 	-- if player is in combat, equip cloak when combat is over
-	if UnitAffectingCombat("player") then
-		--ecPrint("Equpping after combat!")
+	if UnitAffectingCombat("player") then		
 		equipOnyOnCombatEnd = true -- flag for event handler
 		return
 	end	
@@ -110,13 +109,11 @@ local function equipPreviousCloak()
 	end
 	
 		-- if player is in combat, equip cloak when combat is over
-	if UnitAffectingCombat("player") then
-		ecPrint("Equipping " .. EasyCloakDB.previous .. " after combat!")
+	if UnitAffectingCombat("player") then				
 		equipPrevOnCombatEnd = true -- flag for event handler
 		return
-	elseif UnitHealth("player") == 0 then
-		ecPrint("Equipping " .. EasyCloakDB.previous .. " after ress!")
-		equipPrevOnRess = true
+	elseif UnitHealth("player") == 0 then		
+		equipPrevOnRess = true -- flag for event handler
 		return
 	end
 		
@@ -149,23 +146,23 @@ local function onEvent()
 		if equipOnyOnCombatEnd then
 			equipOnyOnCombatEnd = false
 			equipOnyCloak()
-		elseif equipPrevOnCombatEnd then
-			ecPrint("unequipping ony cloak")
+		elseif equipPrevOnCombatEnd then			
 			equipPrevOnCombatEnd = false
 			equipPreviousCloak()
 		end
 	
 	elseif (event == "PLAYER_UNGHOST" or "PLAYER_ALIVE") and equipPrevOnRess then
-		if UnitHealth("player") > 1 then
-			ecPrint("unequip cloak")
+		if UnitHealth("player") > 1 then -- don't equip in ghost form (hp = 1)		
 			equipPrevOnRess = false
 			equipPreviousCloak()
 		end
+		
 	elseif event == "CHAT_MSG_COMBAT_HOSTILE_DEATH" then 		
 		local _,_,victim = string.find(arg1, "(.+)% dies.")
 		if victim and ecBosses[victim] then
 			equipPreviousCloak()
 		end	
+		
 	elseif event == "ADDON_LOADED" and arg1 == "EasyCloak" then
 		if not EasyCloakDB then
 			-- initialize DB (first time addon is loaded)
