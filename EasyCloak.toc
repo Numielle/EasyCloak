@@ -4,6 +4,6 @@
 ## Author: Numielle
 ## Version: 0.1
 ## Dependencies:
-## SavedVariables: 
+## SavedVariablesPerCharacter: EasyCloakDB
 
 EasyCloakMain.lua
