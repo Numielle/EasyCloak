@@ -2,7 +2,7 @@
 ## Title: EasyCloak
 ## Notes: Equips Onyxia Scale Cloak in Nefarian's Lair.
 ## Author: Numielle
-## Version: 0.1
+## Version: 0.2
 ## Dependencies:
 ## SavedVariablesPerCharacter: EasyCloakDB
 
