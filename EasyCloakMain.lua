@@ -25,15 +25,35 @@ end
 
 local ecBosses = Set {"Firemaw", "Ebonroc", "Flamegor", "Nefarian", 	
 	"Elder Mottled Boar"} 
-
+	
 local function ecPrint(msg, r, g, b)
 	r = r or 1
 	g = g or 1
 	b = b or 0
 	if msg then		
-		DEFAULT_CHAT_FRAME:AddMessage("[EasyCloak] " .. tostring(msg), r, g, b)
+		DEFAULT_CHAT_FRAME:AddMessage("[EasyCloak] " .. tostring(msg), r, g, b)		
 	end
 end
+
+local ecTooltip
+local function isSoulbound(bag, slot)
+	-- don't initialize twice
+	ecTooltip = ecTooltip or CreateFrame( "GameTooltip", "ecTooltip", nil, 
+		"GameTooltipTemplate" )
+	ecTooltip:AddFontStrings(
+		ecTooltip:CreateFontString( "$parentTextLeft1", nil, "GameTooltipText" ),
+		ecTooltip:CreateFontString( "$parentTextRight1", nil, "GameTooltipText" ), 
+		ecTooltip:CreateFontString( "$parentTextLeft2", nil, "GameTooltipText" ),
+		ecTooltip:CreateFontString( "$parentTextRight2", nil, "GameTooltipText" ) 
+	);	
+	-- make tooltip "hidden"
+	ecTooltip:SetOwner( WorldFrame, "ANCHOR_NONE" );
+
+	ecTooltip:ClearLines()
+	ecTooltip:SetBagItem(bag, slot)		
+		
+	return (ecTooltipTextLeft2:GetText() == ITEM_SOULBOUND)
+end	
 
 local function nameFromItemlink(itemlink)
 	if itemlink then
@@ -49,15 +69,23 @@ local function nameFromItemlink(itemlink)
 end
 
 local function findCloak(cloakName) 
+	local bagIdx, slotIdx
 	for bag = 0,4 do		
 		for slot = 1,GetContainerNumSlots(bag) do			
 			local itemLink = GetContainerItemLink(bag, slot)		
 			
 			if itemLink and string.find(itemLink, cloakName) then
-				return bag, slot
+			
+				if isSoulbound(bag, slot) then 
+					return bag, slot
+				else 
+					bagIdx, slotIdx = bag, slot
+				end				
 			end				
 		end
 	end
+	
+	return bagIdx, slotIdx
 end
 
 local function saveEquip(bag, slot)
@@ -108,7 +136,7 @@ local function equipPreviousCloak()
 		return
 	end
 	
-		-- if player is in combat, equip cloak when combat is over
+	-- if player is in combat, equip cloak when combat is over
 	if UnitAffectingCombat("player") then				
 		equipPrevOnCombatEnd = true -- flag for event handler
 		return
@@ -136,7 +164,7 @@ local function onEvent()
 			equipOnyCloak()
 		end
 		
-	elseif event == "PLAYER_TARGET_CHANGED" then
+	elseif event == "PLAYER_TARGET_CHANGED" and EasyCloakDB.drakes then
 		if UnitName("target") and ecBosses[UnitName("target")] 
 				and UnitHealth("target") > 0 then
 			equipOnyCloak()
@@ -167,29 +195,38 @@ local function onEvent()
 		if not EasyCloakDB then
 			-- initialize DB (first time addon is loaded)
 			EasyCloakDB = {}
-			EasyCloakDB.drakes = true
+			EasyCloakDB.drakes = true			
 		end
 		
 		-- process settings from DB and perform setup actions
 	end	
  end
  
+local function printStatus()
+	if EasyCloakDB.drakes then
+		ecPrint("Equip on drakes turned ON")
+	else
+		ecPrint("Equip on drakes turned OFF")
+	end
+end
+ 
 f:SetScript("OnEvent", onEvent)
 
 SLASH_EASYCLOAK1 = '/easycloak'
 SLASH_EASYCLOAK2 = '/ec'
 function SlashCmdList.EASYCLOAK(msg, editbox)	
-	if msg == "reset" then
-		if EasyCloakDB.previous then
-			ecPrint("resetting previous cloak")
-			EasyCloakDB.previous = nil
+	if msg == "toggle" then
+		if EasyCloakDB.drakes then
+			EasyCloakDB.drakes = false
+		else
+			EasyCloakDB.drakes = true
 		end
-	elseif msg == "print" then
-		if EasyCloakDB.previous then
-			ecPrint("former cloak: " .. EasyCloakDB.previous)
-		end
+		
+		printStatus()
+	elseif msg == "" then
+		printStatus()		
 	else
-		-- default behavior
- 	end
+	
+	end		
 end
 
