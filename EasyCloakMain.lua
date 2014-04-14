@@ -23,8 +23,7 @@ local function Set (list)
   return set
 end
 
-local ecBosses = Set {"Firemaw", "Ebonroc", "Flamegor", "Nefarian", 	
-	"Elder Mottled Boar"} 
+local ecBosses = Set {"Firemaw", "Ebonroc", "Flamegor", "Nefarian"} 
 	
 local function ecPrint(msg, r, g, b)
 	r = r or 1
