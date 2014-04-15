@@ -1,6 +1,6 @@
 ## Interface: 11200
 ## Title: EasyCloak
-## Notes: Equips Onyxia Scale Cloak in Nefarian's Lair.
+## Notes: Manages your Onyxia Scale Cloak for you.
 ## Author: Numielle
 ## Version: 0.2
 ## Dependencies:
