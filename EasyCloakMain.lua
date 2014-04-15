@@ -1,15 +1,5 @@
-local f = CreateFrame("frame")
-f:RegisterEvent("ZONE_CHANGED_INDOORS")
-f:RegisterEvent("PLAYER_TARGET_CHANGED")
-f:RegisterEvent("PLAYER_REGEN_ENABLED")
-f:RegisterEvent("ADDON_LOADED")
-f:RegisterEvent("CHAT_MSG_COMBAT_HOSTILE_DEATH")
-
-f:RegisterEvent("PLAYER_ALIVE")
-f:RegisterEvent("PLAYER_UNGHOST")
-
-local ONY_CLOAK_NAME = "Onyxia Scale Cloak"
-local ONY_NOT_FOUND_MSG = ONY_CLOAK_NAME.." not found in your inventory!"
+local ONY_CLOAK_ID = 15138
+local ONY_NOT_FOUND_MSG = "Onyxia Scale Cloak not found in your inventory!"
 local PREV_NOT_FOUND_MSG = "Previous cloak not found in your inventory!"
 local equipOnyOnCombatEnd = false
 local equipPrevOnCombatEnd = false
@@ -54,36 +44,34 @@ local function isSoulbound(bag, slot)
 	return (ecTooltipTextLeft2:GetText() == ITEM_SOULBOUND)
 end	
 
-local function nameFromItemlink(itemlink)
+local function idFromLink(itemlink)
 	if itemlink then
-		pattern = "[[].*[]]"
-
-		x,y =  string.find(itemlink,pattern)
-		name =  strsub(itemlink, x + 1, y - 1)
-		
-		return name
-	else 
-		return nil
+		local _,_,id = string.find(itemlink, "|Hitem:([^:]+)%:")
+		return tonumber(id)
 	end
+	
+	return nil	
 end
 
-local function findCloak(cloakName) 
-	local bagIdx, slotIdx
+local function findCloak(itemId) 
+	local bagIdx, slotIdx 
+	
 	for bag = 0,4 do		
 		for slot = 1,GetContainerNumSlots(bag) do			
 			local itemLink = GetContainerItemLink(bag, slot)		
 			
-			if itemLink and string.find(itemLink, cloakName) then
-			
+			if itemLink and idFromLink(itemLink) == tonumber(itemId) then				
 				if isSoulbound(bag, slot) then 
+					-- this is definitely the right item
 					return bag, slot
 				else 
+					-- keep looking for soulbound cloak, store values
 					bagIdx, slotIdx = bag, slot
 				end				
 			end				
 		end
 	end
-	
+		
 	return bagIdx, slotIdx
 end
 
@@ -100,23 +88,22 @@ local function equipOnyCloak()
 	-- check if cloak already equipped and return
 	local currentCloak = GetInventoryItemLink("player", 
 			GetInventorySlotInfo("BackSlot"))
-	if currentCloak and string.find(currentCloak, ONY_CLOAK_NAME) then return end
-
+	if currentCloak and idFromLink(currentCloak) == ONY_CLOAK_ID then return end			
 	-- if player is in combat, equip cloak when combat is over
 	if UnitAffectingCombat("player") then		
 		equipOnyOnCombatEnd = true -- flag for event handler
 		return
 	end	
-	
-	local bag, slot = findCloak(ONY_CLOAK_NAME)
+		
+	local bag, slot = findCloak(ONY_CLOAK_ID)
 	
 	if not (bag and slot) then
 		ecPrint(ONY_NOT_FOUND_MSG, 1, 0, 0)
 		return
 	end
 	
-	-- store itemlink of currently equipped cloak in settings
-	EasyCloakDB.previous = nameFromItemlink(currentCloak)
+	-- store id of currently equipped cloak in settings
+	EasyCloakDB.previous = idFromLink(currentCloak)
 	
 	saveEquip(bag, slot)						
 end
@@ -125,23 +112,27 @@ local function equipPreviousCloak()
 	-- abort if ony cloak is not equipped
 	local currentCloak = GetInventoryItemLink("player", 
 			GetInventorySlotInfo("BackSlot"))
-			
-	if currentCloak and not string.find(currentCloak, ONY_CLOAK_NAME) then 		
+				
+	if currentCloak and not (idFromLink(currentCloak) == ONY_CLOAK_ID) then
 		-- for some reason no onyxia cloak eqipped, do nothing
 		return
+		
 	elseif not EasyCloakDB.previous then
 		-- for some reason previous name not persisted
 		ecPrint("An error occurred, please equip your regular cloak!")
 		return
+		
 	end
-	
+
 	-- if player is in combat, equip cloak when combat is over
 	if UnitAffectingCombat("player") then				
 		equipPrevOnCombatEnd = true -- flag for event handler
 		return
+		
 	elseif UnitHealth("player") == 0 then		
 		equipPrevOnRess = true -- flag for event handler
 		return
+		
 	end
 		
 	local bag, slot = findCloak(EasyCloakDB.previous)
@@ -197,7 +188,6 @@ local function onEvent()
 			EasyCloakDB.drakes = true			
 		end
 		
-		-- process settings from DB and perform setup actions
 	end	
  end
  
@@ -209,6 +199,14 @@ local function printStatus()
 	end
 end
  
+local f = CreateFrame("frame")
+f:RegisterEvent("ZONE_CHANGED_INDOORS")
+f:RegisterEvent("PLAYER_TARGET_CHANGED")
+f:RegisterEvent("PLAYER_REGEN_ENABLED")
+f:RegisterEvent("ADDON_LOADED")
+f:RegisterEvent("CHAT_MSG_COMBAT_HOSTILE_DEATH")
+f:RegisterEvent("PLAYER_ALIVE")
+f:RegisterEvent("PLAYER_UNGHOST")
 f:SetScript("OnEvent", onEvent)
 
 SLASH_EASYCLOAK1 = '/easycloak'
@@ -223,9 +221,6 @@ function SlashCmdList.EASYCLOAK(msg, editbox)
 		
 		printStatus()
 	elseif msg == "" then
-		printStatus()		
-	else
-	
+		printStatus()
 	end		
 end
-
