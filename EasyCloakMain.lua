@@ -200,7 +200,7 @@ local function printStatus()
 		ecPrint("Equip on drakes turned ON")
 	else
 		ecPrint("Equip on drakes turned OFF")
-	end
+	end	
 end
  
 local f = CreateFrame("frame")
@@ -227,8 +227,10 @@ function SlashCmdList.EASYCLOAK(msg, editbox)
 	elseif msg == "notify" then
 		if EasyCloakDB.notify then
 			EasyCloakDB.notify = false
+			ecPrint("Equip notification turned OFF")
 		else
 			EasyCloakDB.notify = true
+			ecPrint("Equip notification turned ON")
 		end
 	elseif msg == "" then
 		printStatus()
