@@ -79,9 +79,13 @@ local function saveEquip(bag, slot)
 	-- put previously selected item back
 	if CursorHasItem() then ClearCursor() end 
 	
+	if EasyCloakDB.notify then
+		ecPrint("equipping " .. GetContainerItemLink(bag, slot))
+	end
+	
 	-- pickup and equip ony scale cloak
 	PickupContainerItem(bag,slot)
-	AutoEquipCursorItem()
+	AutoEquipCursorItem()	
 end
 
 local function equipOnyCloak() 
@@ -220,6 +224,12 @@ function SlashCmdList.EASYCLOAK(msg, editbox)
 		end
 		
 		printStatus()
+	elseif msg == "notify" then
+		if EasyCloakDB.notify then
+			EasyCloakDB.notify = false
+		else
+			EasyCloakDB.notify = true
+		end
 	elseif msg == "" then
 		printStatus()
 	end		
