@@ -2,7 +2,7 @@
 ## Title: EasyCloak
 ## Notes: Manages your Onyxia Scale Cloak for you.
 ## Author: Numielle
-## Version: 0.2
+## Version: 0.3
 ## Dependencies:
 ## SavedVariablesPerCharacter: EasyCloakDB
 
