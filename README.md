@@ -19,6 +19,9 @@ prints currenty configuration (ON/OFF)
     /ec toggle   [or /easycloak toggle]
 switches from ON to OFF and vice versa and prints new config
 
+    /ec notify   [or /easycloak notify]
+switches equipment notification from ON to OFF and vice versa and prints new config
+
 Here's a preview: https://www.youtube.com/watch?v=cPNl_njfuyk
 
 Also I'd like to thank Vaegar for his support and give a shout out to the incredible amount of boars that sacrificed their lives during development.
